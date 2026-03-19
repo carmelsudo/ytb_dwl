@@ -1,8 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'pages/home_page.dart';
-import 'pages/dowloading_page.dart';
-import 'pages/downloaded_page.dart';
 
 void main() {
   runApp(const MyApp());
