@@ -1,0 +1,15 @@
+https://youtu.be/LjZxeSne67E?si=FfLr8HO85QeCwvd6
+
+https://youtu.be/sy4IhE-KAEg?si=5UpSG8N1SSJQzOp6
+
+
+les erreurs remarqué sur la platforme : 
+ 1- l'application n'est pas responsive,
+ 2- la fenètre d'acceuil ne se ferme pas sur windows meme si on appuie sur 	     commancer, ce qui voudrait dire qu'une des variables *isFirstLunch ou showTutorial   n'est pas mis a false
+ 3- sharedPreference marche bien puisque l'utlisateur ne voit pas deux fois la page de dialogue
+4 - annuler un téléchargement après l'affichage de la boite des informations cache un téléchargement déja lancé, cela est du a l'actualisation de la variable isDow a false par le bouton annuler
+ 
+
+Perspective d'amélioration : 
+ 1- Faire un onglet pour les téléchargement afin d'autoriser le téléchargement de plusieurs vidéo a la fois
+ 2 - Voir la liste des vidéos déja télécharger
