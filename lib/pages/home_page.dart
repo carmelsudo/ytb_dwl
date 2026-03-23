@@ -38,6 +38,7 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
   bool isFolderSelectionWidgetVisible = false;
   bool isFirstLunching = true;
   int _currentIndex = 0;
+  int closeIconColor = 0xFF000000;
   Map<String, String> videoMeta = {
     "title": "",
     "author": "",
@@ -228,7 +229,7 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
                       child: Text("Commencer")),
                 ),
               ),
-              Text("Développé par CHABI Carmel"),
+              Text("Développé par CHABI Carmel & AMOUSSOU Ricardo"),
               TextButton.icon(
                 onPressed: () async {
                   try {
@@ -244,7 +245,7 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
                   }
                 },
                 icon: Image.asset("assets/images/gmail.png"),
-                label: Text("M'envoyer un email"),
+                label: Text("Envoyer un email"),
               )
             ],
           ),
@@ -467,6 +468,20 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Transform.translate(
+                offset: Offset(220, 0),
+                child: IconButton(
+                    onPressed: videoDestinationPath.isEmpty
+                        ? null
+                        : () {
+                            setState(() {
+                              showTutorial = false;
+                              _currentIndex = 0;
+                            });
+                          },
+                    disabledColor: Colors.transparent,
+                    icon: const Icon(Icons.close)),
+              ),
               //logo d'acceuil
               Expanded(
                 flex: 1,
