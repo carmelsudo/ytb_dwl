@@ -26,6 +26,75 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
   }
 
   //
+  Future<void> initVideoDownload(String videoLink) async {
+    try {
+      final yt = YoutubeExplode();
+      var manifest = await yt.videos.streamsClient.getManifest(videoLink);
+      var streamInfo =
+          manifest.muxed.withHighestBitrate(); //choix de la qualité
+
+      if (videoDestinationPath.isEmpty) {
+        await selectPath();
+      }
+
+      var file = File('$videoDestinationPath/${videoMeta["title"]}.mp4');
+      var fileStream = file.openWrite();
+
+      var stream = yt.videos.streamsClient.get(streamInfo);
+      int totalBytes = streamInfo.size.totalBytes;
+      int downloadedBytes = 0;
+
+      // La boucle magique
+      await for (var data in stream) {
+        if (!_isDownloading) {
+          await fileStream.close();
+          yt.close();
+          if (await file.exists()) {
+            await file.delete();
+          }
+          return;
+        }
+        downloadedBytes += data.length;
+
+        // On met à jour l'interface utilisateur !
+        setState(() {
+          _progress =
+              downloadedBytes / totalBytes; // Donne un chiffre entre 0.0 et 1.0
+        });
+
+        fileStream.add(data);
+      }
+
+      await fileStream.close();
+      yt.close();
+
+      setState(() {
+        _isDownloading = false;
+        _textStatus = "téléchargement terminé";
+      });
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(_textStatus),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(25),
+          showCloseIcon: true,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(15)),
+        ));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(25),
+        content: Text(_textStatus),
+        backgroundColor: const Color.fromARGB(164, 76, 175, 79),
+        showCloseIcon: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(15)),
+      ));
+    }
+  }
 
   //etat de la recherche sur youtube
   double _progress = 0.0;
@@ -270,74 +339,6 @@ class _YoutubeDowloaderState extends State<YoutubeDowloader> {
   }
 
   //fonction pour enregistrer la video
-  Future<void> initVideoDownload(String videoLink) async {
-    try {
-      final yt = YoutubeExplode();
-      var manifest = await yt.videos.streamsClient.getManifest(videoLink);
-      var streamInfo = manifest.muxed.withHighestBitrate();
-
-      if (videoDestinationPath.isEmpty) {
-        await selectPath();
-      }
-
-      var file = File('$videoDestinationPath/${videoMeta["title"]}.mp4');
-      var fileStream = file.openWrite();
-
-      var stream = yt.videos.streamsClient.get(streamInfo);
-      int totalBytes = streamInfo.size.totalBytes;
-      int downloadedBytes = 0;
-
-      // La boucle magique
-      await for (var data in stream) {
-        if (!_isDownloading) {
-          await fileStream.close();
-          yt.close();
-          if (await file.exists()) {
-            await file.delete();
-          }
-          return;
-        }
-        downloadedBytes += data.length;
-
-        // On met à jour l'interface utilisateur !
-        setState(() {
-          _progress =
-              downloadedBytes / totalBytes; // Donne un chiffre entre 0.0 et 1.0
-        });
-
-        fileStream.add(data);
-      }
-
-      await fileStream.close();
-      yt.close();
-
-      setState(() {
-        _isDownloading = false;
-        _textStatus = "téléchargement terminé";
-      });
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(_textStatus),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(25),
-          showCloseIcon: true,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(15)),
-        ));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(25),
-        content: Text(_textStatus),
-        backgroundColor: const Color.fromARGB(164, 76, 175, 79),
-        showCloseIcon: true,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(15)),
-      ));
-    }
-  }
 
   //widget a afficher au démarrage du téléchargement
   Widget downloadingVideoWidget(double progress) {
